@@ -20,6 +20,13 @@ spec:
 {{ tpl . $ | indent 8 }}
       {{- end }}
     spec:
+      {{- if hasKey .Values.agent "hostNetwork" }}
+      hostNetwork: {{ .Values.agent.hostNetwork }}
+      {{- end }}
+      {{ with .Values.agent.tolerations -}}
+      tolerations:
+{{ toYaml . | indent 6 }}
+      {{- end }}
       {{ with .Values.build_index.initContainers -}}
       initContainers:
 {{ toYaml . | indent 6 }}{{ end }}

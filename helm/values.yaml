@@ -7,6 +7,11 @@ kraken:
 tracker:
   config: /etc/config/tracker.yaml
   replicas: 3
+  hostNetwork: true
+  tolerations:
+    - key: "node.kubernetes.io/not-ready"
+      operator: "Exists"
+      effect: "NoExecute"
   extraVolumes:
 #  - name: nginx-cache
 #    hostPath:
@@ -31,6 +36,11 @@ build_index:
   extraVolumes:
   extraVolumeMounts:
   initContainers:
+  hostNetwork: true
+  tolerations:
+    - key: "node.kubernetes.io/not-ready"
+      operator: "Exists"
+      effect: "NoExecute"
 #  extraBackends: |-
 #    - namespace: library/.*
 #      backend:
@@ -48,6 +58,11 @@ origin:
   extraVolumes:
   extraVolumeMounts:
   initContainers:
+  hostNetwork: true
+  tolerations:
+    - key: "node.kubernetes.io/not-ready"
+      operator: "Exists"
+      effect: "NoExecute"
 #  extraBackends: |-
 #    - namespace: library/.*
 #      backend:
@@ -65,6 +80,11 @@ proxy:
   extraVolumes:
   extraVolumeMounts:
   initContainers:
+  hostNetwork: true
+  tolerations:
+    - key: "node.kubernetes.io/not-ready"
+      operator: "Exists"
+      effect: "NoExecute"
 
 agent:
   config: /etc/config/agent.yaml
@@ -72,8 +92,11 @@ agent:
   extraVolumes:
   extraVolumeMounts:
   initContainers:
+  hostNetwork: true
   tolerations:
-#    - operator: "Exists"
+    - operator: "Exists"
+  nodeSelector:
+    agents-group: kraken-agent
 testfs:
   enabled: true
   annotations:
