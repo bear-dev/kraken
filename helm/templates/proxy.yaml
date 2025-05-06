@@ -21,16 +21,25 @@ spec:
 {{ tpl . $ | indent 8 }}
       {{- end }}
     spec:
-      {{- if hasKey .Values.agent "hostNetwork" }}
-      hostNetwork: {{ .Values.agent.hostNetwork }}
+      {{- if hasKey .Values.proxy "hostNetwork" }}
+      hostNetwork: {{ .Values.proxy.hostNetwork }}
       {{- end }}
-      {{ with .Values.agent.tolerations -}}
+      {{ with .Values.proxy.tolerations -}}
       tolerations:
 {{ toYaml . | indent 6 }}
       {{- end }}
       {{ with .Values.proxy.initContainers -}}
       initContainers:
-{{ toYaml . | indent 6 }}{{ end }}
+{{ toYaml . | indent 6 }}
+      {{ end }}
+      {{- if .Values.proxy.affinity }}
+      {{ with .Values.proxy.affinity -}}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+{{ toYaml . | indent 12 }}
+      {{- end }}
+      {{- end }}
       containers:
       - name: main
         image: {{ .Values.kraken.repository }}/kraken-proxy:{{ .Values.kraken.tag }}
@@ -54,6 +63,7 @@ apiVersion: v1
 metadata:
   name: kraken-proxy
 spec:
+  type: NodePort
   selector:
     app.kubernetes.io/name: kraken
     app.kubernetes.io/component: proxy
@@ -62,3 +72,4 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 80
+    nodePort: {{ .Values.kraken.proxy_port }}

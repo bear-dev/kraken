@@ -2,7 +2,11 @@ kraken:
   repository: gcr.io/uber-container-tools
   tag: v0.1.1
   imagePullPolicy: IfNotPresent
-  registry_port: 30081
+  tracker_port: 30011
+  build_index_port: 30021
+  origin_port: 30031
+  proxy_port: 30041
+  registry_port: 30051
 
 tracker:
   config: /etc/config/tracker.yaml
@@ -11,7 +15,15 @@ tracker:
   tolerations:
     - key: "node.kubernetes.io/not-ready"
       operator: "Exists"
-      effect: "NoExecute"
+      effect: "NoSchedule"
+  affinity:
+    - labelSelector:
+        matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+              - kraken
+      topologyKey: kubernetes.io/hostname
   extraVolumes:
 #  - name: nginx-cache
 #    hostPath:
@@ -40,7 +52,15 @@ build_index:
   tolerations:
     - key: "node.kubernetes.io/not-ready"
       operator: "Exists"
-      effect: "NoExecute"
+      effect: "NoSchedule"
+  affinity:
+    - labelSelector:
+        matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+              - kraken
+      topologyKey: kubernetes.io/hostname
 #  extraBackends: |-
 #    - namespace: library/.*
 #      backend:
@@ -62,7 +82,18 @@ origin:
   tolerations:
     - key: "node.kubernetes.io/not-ready"
       operator: "Exists"
-      effect: "NoExecute"
+      effect: "NoSchedule"
+  affinity:
+    - labelSelector:
+        matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+              - kraken
+      topologyKey: kubernetes.io/hostname
+  imagePullSecrets:
+    - name: nvcr.io
+  image: "nvcr.io/nv-ngn/sdn-dev/akorobkov:kraken-origin"
 #  extraBackends: |-
 #    - namespace: library/.*
 #      backend:
@@ -84,7 +115,15 @@ proxy:
   tolerations:
     - key: "node.kubernetes.io/not-ready"
       operator: "Exists"
-      effect: "NoExecute"
+      effect: "NoSchedule"
+  affinity:
+    - labelSelector:
+        matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+              - kraken
+      topologyKey: kubernetes.io/hostname
 
 agent:
   config: /etc/config/agent.yaml
@@ -95,8 +134,24 @@ agent:
   hostNetwork: true
   tolerations:
     - operator: "Exists"
+  affinity:
+    - labelSelector:
+        matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+              - kraken
+      topologyKey: kubernetes.io/hostname
   nodeSelector:
     agents-group: kraken-agent
+  imagePullSecrets:
+    - name: nvcr.io
+  image: "nvcr.io/nv-ngn/sdn-dev/akorobkov:kraken-agent"
 testfs:
   enabled: true
+  hostNetwork: true
+  tolerations:
+    - key: "node.kubernetes.io/not-ready"
+      operator: "Exists"
+      effect: "NoSchedule"
   annotations:

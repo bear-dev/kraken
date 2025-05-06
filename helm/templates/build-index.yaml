@@ -20,12 +20,20 @@ spec:
 {{ tpl . $ | indent 8 }}
       {{- end }}
     spec:
-      {{- if hasKey .Values.agent "hostNetwork" }}
-      hostNetwork: {{ .Values.agent.hostNetwork }}
+      {{- if hasKey .Values.build_index "hostNetwork" }}
+      hostNetwork: {{ .Values.build_index.hostNetwork }}
       {{- end }}
-      {{ with .Values.agent.tolerations -}}
+      {{ with .Values.build_index.tolerations -}}
       tolerations:
 {{ toYaml . | indent 6 }}
+      {{- end }}
+      {{- if .Values.build_index.affinity }}
+      {{ with .Values.build_index.affinity -}}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+{{ toYaml . | indent 12 }}
+      {{- end }}
       {{- end }}
       {{ with .Values.build_index.initContainers -}}
       initContainers:
@@ -53,7 +61,7 @@ apiVersion: v1
 metadata:
   name: kraken-build-index
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     app.kubernetes.io/name: kraken
     app.kubernetes.io/component: build-index
@@ -62,3 +70,4 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 80
+    nodePort: {{ .Values.kraken.build_index_port }}
