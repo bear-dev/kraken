@@ -4,7 +4,7 @@
 {{- define "trackers" -}}
 tracker:
   hosts:
-    dns: kraken-tracker:80
+    dns: kraken-tracker:30011
 {{- end -}}
 
 
@@ -12,12 +12,12 @@ tracker:
 {{- define "origins" -}}
 origin:
   hosts:
-    dns: kraken-origin:80
+    dns: kraken-origin:30031
 {{- end -}}
 
 {{- define "origin-cluster" -}}
 cluster:
-  dns: kraken-origin:80
+  dns: kraken-origin:30031
 {{- end -}}
 
 
@@ -25,13 +25,13 @@ cluster:
 {{- define "build-index" -}}
 build_index:
   hosts:
-    dns: kraken-build-index:80
+    dns: kraken-build-index:30021
 {{- end -}}
 
 {{- define "build-index-cluster" -}}
 cluster:
   hosts:
-    dns: kraken-build-index:80
+    dns: kraken-build-index:30021
 {{- end -}}
 
 
